@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>reveal.js</title>
+		<title>Getting Started With Docker</title>
 
 		<link rel="stylesheet" href="css/reveal.css">
 		<link rel="stylesheet" href="css/theme/black.css">
@@ -24,8 +24,129 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+				<section>
+					<h1>
+					Getting started with Docker
+					</h1>
+					<br><br>
+					<h3><small>Sometimes also known as: </small><br/>Docker for dummies<span class="fragment">&trade;</span></h3>
+				</section>
+				<section>
+					<section>
+						<h2>WTF is Docker?</h2>
+						<div class="fragment">Docker is a container technology for Linux that allows a developer to package up an application with all of the parts it needs.</div>
+					</section>
+					<section>
+						So, Docker is a VM then?
+					</section>
+					<section>
+						<img src="img/stack.png" alt="">
+						<aside class="notes">
+							<ul>
+								<li>Vagrant gebruikt een provision script om de hele env. Op te zetten op exact dezelfde manier als in productie</li>
+								<li>Vagrant = boxes; Heavy boxen</li>
+								<li>Docker gebruikt containers, instanties van een image, De image heeft de hele code/stack maar geen heel OS.</li>
+								<li>Docker draait op een machine (niet-echt-gevirtualiseerde top layer).</li>
+								<li>Docker is een heel stuk lichter en sneller in spin-up en execution dan Vagrant of VMs.</li>
+								<li>Docker neemt wel veel harde schijf ruimte in (maar probeert hier slim mee om te springen) en is minder geschikt voor applicaties met veel IO calls (hardware acceleration, ….) Data storage is een uitzondering, maar zelfs dan is de Delay behoorlijk groot in vergelijking met sommige andere geritualiseerde systemen.</li>
+								<li>Docker is wel zeer lightweight voor het systeem en is nauwelijks merkbaar wanneer er geen actieve request bezig is.</li>
+								<li>Verschillende containers kunnen uit 1 image opgestart worden.</li>
+							</ul>
+						</aside>
+					</section>
+				</section>
+
+				<section>
+					<h2>So why Docker?</h2>
+					<aside class="notes">
+						<ul>
+							<li>Vagrant lost ‘works on my machine’ op => VMs met zelfde toolset, zelfde packages, virtuele ‘productie’ Setup</li>
+							<li>Vagrant heeft voor iedere image opnieuw 'behoorlijk wat werk' om alles weer op te zetten</li>
+							<li>Fantastisch voor microservices</li>
+							<li>Fantastisch voor horizontaal scalen (mesos/coreOS)</li>
+							<li>Fantastisch voor failover</li>
+						</ul>
+					</aside>
+				</section>
+
+				<section>
+					<ul>
+						<li>repository</li>
+						<li>images</li>
+						<li>containers</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Installing docker:</h2>
+					<ul>
+						<li>https://docs.docker.com/docker-for-mac</li>
+						<li>https://docs.docker.com/docker-for-windows</li>
+						<li>https://docs.docker.com/install/linux/docker-ce/ubuntu/</li>
+						<li>Or get DigitalOcean Docker Droplet</li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Basic Commands</h2>
+					<pre>
+						<code class="hljs bash" data-trim contenteditable>
+							docker run IMAGE
+							docker start name|id
+							docker stop name|id
+							docker ps [-a includes stopped containers]
+							docker rm name|id
+						</code>
+				 </pre>
+
+				 <aside class="notes">
+					 <ul>
+					 	<li>run creeert een nieuwe container; 4x run = 4 removeAllContainers</li>
+						<li>start, start een bestaande containers</li>
+						<li>stop stopt een bestaande container</li>
+						<li>ps list output</li>
+						<li>rm verwijderd de container</li>
+					</ul>
+				 </aside>
+				</section>
+
+				<section>
+					<h2>Let's go:</h2>
+					<pre>
+						<code class="hljs bash" data-trim contenteditable>
+							docker run tutum/hello-world
+							# new window
+							docker ps
+							# Not available via localhost:80 (only via DOCKERIP:80)
+							docker run -p 8080:80 tutum/hello-world
+							# Now remove the containers
+							docker ps -a
+							docker rm CONTAINER_ID
+							docker ps -a
+						</code>
+					</pre>
+				</section>
+
+				<section>
+					<pre><code class="hljs bash" data-trim contenteditable>
+						# Now let's loadbalance
+						docker run --name web1 -p 8081:80 tutum/hello-world
+						# OR
+						docker run -d --name web1 -p 8081:80 tutum/hello-world
+						docker run -d --name web2 -p 8082:80 tutum/hello-world
+						docker run -d --name web3 -p 8083:80 tutum/hello-world
+
+						# STATUS
+						docker ps
+						# Test in browser
+						# Stop web3
+						docker stop web3
+						docker ps
+						docker ps -a
+						docker start web3
+					</code></pre>
+				</section>
+
 			</div>
 		</div>
 
