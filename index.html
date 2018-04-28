@@ -57,6 +57,10 @@
 				</section>
 
 				<section>
+					<img src="img/docker-image.png" alt="">
+				</section>
+
+				<section>
 					<h2>So why Docker?</h2>
 					<aside class="notes">
 						<ul>
@@ -84,6 +88,7 @@
 						<li>https://docs.docker.com/docker-for-windows</li>
 						<li>https://docs.docker.com/install/linux/docker-ce/ubuntu/</li>
 						<li>Or get DigitalOcean Docker Droplet</li>
+						<li>Or get boot2docker</li>
 					</ul>
 				</section>
 
@@ -145,6 +150,168 @@
 						docker ps -a
 						docker start web3
 					</code></pre>
+				</section>
+
+				<section>
+					<h2>Let's create our own docker image</h2>
+					<a href="https://github.com/Brixel/MusicRestService">https://github.com/Brixel/MusicRestService</a>
+					<section>
+						<pre><code class="hljs docker" data-trim contenteditable>
+							# iron/go:dev is the alpine image with the go tools added
+							FROM iron/go:dev
+							WORKDIR /app
+							# Set an env var that matches your github repo name, replace Brixel/MusicRestService here with your repo name
+							ENV SRC_DIR=/go/src/github.com/Brixel/MusicRestService/
+							# Add the source code:
+							ADD . $SRC_DIR
+							# Build it:
+							RUN cd $SRC_DIR; go build -o musicRestService; cp musicRestService /app/
+							ENTRYPOINT ["./musicRestService"]
+
+							# EXPOSE 3000
+						</code></pre>
+					</section>
+					<section>
+						<pre><code class="hljs bash" data-trim contenteditable>
+							docker build -t Brixel/MusicRestService .
+							docker run -d --name mrs1 -p 3000:80 Brixel/MusicRestService
+							# Send off
+							docker push Brixel/MusicRestService
+						</code></pre>
+
+						<aside class="notes">
+							Duidelijk dat docker niet werkt voor development.
+							Develop close, test in Docker, push & deploy using Docker in CI
+						</aside>
+					</section>
+
+					<section>
+						<h3>Another example (Node):</h3>
+						<pre><code class="hljs docker" data-trim contenteditable>
+							FROM node:5.6.0
+
+							ENV DEBUG app:prod
+							ENV NODE_ENV production
+
+							#Configure timezone
+							RUN echo "Europe/Brussels" > /etc/timezone
+							RUN dpkg-reconfigure -f noninteractive tzdata
+
+							WORKDIR /app
+							ADD . /app
+
+							RUN npm install --production
+							RUN npm run webpack
+
+							EXPOSE 3000
+
+							CMD["npm", "start"]
+						</code></pre>
+					</section>
+
+					<section>
+						<h3>Another example (Go compiled):</h3>
+						<pre><code class="hljs docker" data-trim contenteditable>
+							FROM scratch
+							ADD main /
+							CMD ["/main"]
+						</code></pre>
+					</section>
+				</section>
+
+				<section>
+					<h2>Advantage wrap up:</h2>
+					<ul>
+						<li>build are quick & start instant</li>
+						<li>horizontal scaling from the get go</li>
+						<li>provisioning is simple</li>
+						<li>easy set up for new 1-off envs</li>
+						<li>ideal for locally running dependencies</li>
+						<li>different languages/frameworks/databases for each component if you desire</li>
+					</ul>
+				</section>
+
+				<section>
+					<section>
+						<h2>How to scale this?</h2>
+						<video loop autoplay width="480" height="320">
+							<source src="https://media.giphy.com/media/26xBKJclSF8d57UWs/giphy.mp4" type="video/mp4"></source>
+						</video>
+					</section>
+
+					<section>
+						<img src="img/clustering%20coreos.svg"/>
+						<a href="https://gist.github.com/learncodeacademy/2a11bd906c87cf2301a1">https://gist.github.com/learncodeacademy/2a11bd906c87cf2301a1</a>
+					</section>
+
+					<section>
+						<img src="http://infoslack.com/images/etcd-cluster.png" alt="">
+						<aside class="notes">
+							<ul>
+								<li>blauwe zones = docker capaciteit</li>
+								<li>etc folder is vervangen door een service etcd (alle db configuratie etc zit hier)</li>
+							</ul>
+						</aside>
+					</section>
+
+					<section>
+						<a href="https://gist.github.com/learncodeacademy/2a11bd906c87cf2301a1#file-cloud-config-yml">cloud-config.yml</a>
+					</section>
+
+					<section>
+						<img src="https://coreos.com/os/docs/latest/img/prod.png" alt="">
+					</section>
+
+					<section>
+						<ul>
+							<li>etcd = config shares</li>
+							<li>fleet = machine management</li>
+							<li>flannel = service registration en discovery</li>
+						</ul>
+					</section>
+				</section>
+
+				<section>
+					<video loop autoplay width="480" height="320">
+						<source src="https://media.giphy.com/media/AZemObXVMo4mY/giphy.mp4" type="video/mp4"></source>
+					</video>
+
+					<video loop autoplay width="480" height="320">
+						<source src="https://media.giphy.com/media/C4wDXSJjt0ZKU/giphy.mp4" type="video/mp4"></source>
+					</video>
+				</section>
+
+				<section>
+					<h2>Learn more?</h2>
+					<a href="https://www.youtube.com/playlist?list=PLoYCgNOIyGAAzevEST2qm2Xbe3aeLFvLc">Docker Tutorials on Youtube</a>
+				</section>
+
+				<section>
+					<section>
+						<h2>Git push all the things!</h2>
+						<video loop autoplay width="480" height="320">
+							<source src="https://media.giphy.com/media/iEb3BPbuMlHPy/giphy.mp4" type="video/mp4"></source>
+						</video>
+					</section>
+
+					<section>
+						<a href="https://www.heroku.com/">Heroku</a>
+						<a href="http://dokku.viewdocs.io/dokku/">Dokku</a>
+						<hr/>
+						<a href="https://flynn.io/">Flynn.io</a>
+						<a href="https://kubernetes.io/">Kubernetes</a>
+					</section>
+
+					<section>
+						<a href="http://dokku.viewdocs.io/dokku/deployment/methods/buildpacks/">http://dokku.viewdocs.io/dokku/deployment/methods/buildpacks/</a>
+					</section>
+
+					<section>
+						<a href="https://www.minio.io/">https://www.minio.io/</a>
+						<a href="https://github.com/slypix/minio-dokku">Deploying minio on dokku</a>
+					</section>
+
+
 				</section>
 
 			</div>
